@@ -1,0 +1,16 @@
+{
+  "name": "local-evaluation",
+  "version": "1.0.1",
+  "description": "starts local evaluation amplitudes server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "chandrjeetn@lambdatest.com",
+  "license": "ISC",
+  "dependencies": {
+    "@amplitude/experiment-node-server": "^1.4.0",
+    "lodash": "^4.17.21"
+  }
+}

@@ -5,7 +5,7 @@ var experiment;
 var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || true;
 var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "https://api.lambdatest.com";
 var flagConfigPollingIntervalMillis = process.env.LOCAL_EVALUATION_CONFIG_POLL_INTERVAL || 10;
-var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "";
+var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "server-prdcpdFqASTGAUZ7rifW4B9nPKtkhmpx";
 
 function validateuser(user) {
     let userProperties = {};

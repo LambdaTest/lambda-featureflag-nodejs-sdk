@@ -2,10 +2,10 @@ const Experiment = require('@amplitude/experiment-node-server');
 const _ = require('lodash');
 
 var experiment;
-var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || false;
-var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "https://api.lab.amplitude.com";
+var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || true;
+var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "https://api.lambdatest.com";
 var flagConfigPollingIntervalMillis = process.env.LOCAL_EVALUATION_CONFIG_POLL_INTERVAL || 10;
-var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "";
+var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "server-jAqqJaX3l8PgNiJpcv9j20ywPzANQQFh";
 
 function validateuser(user) {
     let userProperties = {};
@@ -27,14 +27,14 @@ function validateuser(user) {
     if (user && user.hub_region && typeof user.hub_region === "string") {
         userProperties.hub_region = user.hub_region;
     }
-    if (user && user.org_status && typeof user.org_status === "string") {
-        userProperties.org_status = user.org_status;
+    if (user && user.infra_provider && typeof user.infra_provider === "string") {
+        userProperties.infra_provider = user.infra_provider;
     }
     if (user && user.subscription_type && typeof user.subscription_type === "string") {
         userProperties.subscription_type = user.subscription_type;
     }
-    if (user && user.subscription_status && typeof user.subscription_status === "string") {
-        userProperties.subscription_status = user.subscription_status;
+    if (user && user.template_id && typeof user.template_id === "string") {
+        userProperties.template_id = user.template_id;
     }
     return userProperties;
 }

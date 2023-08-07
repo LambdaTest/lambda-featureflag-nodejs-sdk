@@ -36,6 +36,9 @@ function validateuser(user) {
     if (user && user.template_id && typeof user.template_id === "string") {
         userProperties.template_id = user.template_id;
     }
+    if (user && user.user_status && typeof user.user_status === "string") {
+        userProperties.user_status = user.user_status;
+    }
     return userProperties;
 }
 

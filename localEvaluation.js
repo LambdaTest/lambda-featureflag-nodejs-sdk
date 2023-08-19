@@ -1,5 +1,6 @@
 const Experiment = require('@amplitude/experiment-node-server');
 const _ = require('lodash');
+const {request} = require("https");
 
 var experiment;
 var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || true;
@@ -11,6 +12,9 @@ function validateuser(user) {
     let userProperties = {};
     if (user && user.org_id && typeof user.org_id === "string") {
         userProperties.org_id = user.org_id;
+    }
+    if (user && user.user_id && typeof user.user_id === "string") {
+        userProperties.user_id = user.user_id;
     }
     if (user && user.org_name && typeof user.org_name === "string") {
         userProperties.org_name = user.org_name;
@@ -55,11 +59,53 @@ async function Initialize() {
     }
 }
 
+async function exposureEvent(variants, flagName, user_id) {
+    if (variants && variants[flagName]) {
+        let exposurePayload = {};
+        exposurePayload.api_key = process.env.ANALYTICS_API_KEY;
+        let event = {};
+        event.event_type = "$exposure";
+        event.user_id = user_id;
+        event.event_properties = {
+            flag_key: flagName,
+            variant: variants[flagName]
+        }
+        let events=[];
+        events.push(event);
+        exposurePayload.events = events;
+        const payloadInBytes = JSON.stringify(exposurePayload);
+        const options = {
+            hostname: 'api2.amplitude.com',
+            path: '/2/httpapi',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        const req = request(options, response => {
+            let responseData = '';
+            response.on('data', chunk => {
+                responseData += chunk;
+            });
+            response.on('end', () => {
+                console.log('Response:', responseData);
+            });
+        });
+        req.on('error', error => {
+            console.error('Error:', error);
+        });
+        req.write(payloadInBytes);
+        req.end();
+    }
+}
+
 async function fetch(flagName, user) {
     try {
         const userProp = validateuser(user);
-        const expUser = {user_properties: userProp};
-        return await experiment.evaluate(expUser, [flagName]);
+        const expUser = {user_id: userProp.user_id, user_properties: userProp};
+        const variants = await experiment.evaluate(expUser, [flagName]);
+        exposureEvent(variants, flagName, userProp.user_id);
+        return variants;
     } catch (e) {
         return new Error(`error in evaluating flag: ${flagName} error: ${e}`)
     }

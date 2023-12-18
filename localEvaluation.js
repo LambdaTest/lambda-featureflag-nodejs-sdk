@@ -2,7 +2,7 @@ const Experiment = require('@amplitude/experiment-node-server');
 const _ = require('lodash');
 
 var experiment;
-var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || true;
+var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG=="true" || false;
 var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "https://api.lambdatest.com";
 var flagConfigPollingIntervalMillis = process.env.LOCAL_EVALUATION_CONFIG_POLL_INTERVAL || 10;
 var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "server-jAqqJaX3l8PgNiJpcv9j20ywPzANQQFh";

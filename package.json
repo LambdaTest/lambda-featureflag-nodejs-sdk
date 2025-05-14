@@ -1,16 +1,21 @@
 {
-  "name": "local-evaluation",
-  "version": "1.0.1",
-  "description": "starts local evaluation amplitudes server",
-  "main": "index.js",
+  "name": "lambda-featureflag-nodejs-sdk",
+  "version": "1.0.0",
+  "description": "Lambda Feature Flag SDK for Node.js",
+  "main": "rootOrg/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "chandrjeetn@lambdatest.com",
+  "keywords": [
+    "feature-flag",
+    "lambda",
+    "sdk"
+  ],
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "@amplitude/experiment-node-server": "1.4.0",
-    "lodash": "^4.17.21"
+    "@amplitude/experiment-node-server": "^1.4.0",
+    "lodash": "^4.17.21",
+    "axios": "^1.6.7"
   }
 }

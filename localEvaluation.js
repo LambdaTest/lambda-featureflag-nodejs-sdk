@@ -1,11 +1,43 @@
 const Experiment = require('@amplitude/experiment-node-server');
 const _ = require('lodash');
+const { Client, Config } = require('./rootOrg');
 
 var experiment;
-var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG=="true" || false;
-var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "https://api.lambdatest.com";
-var flagConfigPollingIntervalMillis = process.env.LOCAL_EVALUATION_CONFIG_POLL_INTERVAL || 10;
+let rootOrgClient = null;
+
+var debug = process.env.LOCAL_EVALUATION_CONFIG_DEBUG || false;
+var serverUrl = process.env.LOCAL_EVALUATION_CONFIG_SERVER_URL || "http://api.lambdatest.com";
+var flagConfigPollingIntervalMillis = process.env.LOCAL_EVALUATION_CONFIG_POLL_INTERVAL || 120;
+var apiRequestTimeout = process.env.LOCAL_EVALUATION_API_REQUEST_TIMEOUT || 10;
 var deploymentKey = process.env.LOCAL_EVALUATION_DEPLOYMENT_KEY || "server-jAqqJaX3l8PgNiJpcv9j20ywPzANQQFh";
+
+
+async function initializeRootOrg(retries = 3) {
+    
+    rootOrgClient = new Client(deploymentKey, new Config(
+        serverUrl,
+        flagConfigPollingIntervalMillis * 1000,
+        apiRequestTimeout * 1000
+    ));
+
+    let error = null;
+    for (let i = 0; i < retries; i++) {
+        try {
+            await rootOrgClient.start();
+            error = null;
+            break;
+        } catch (err) {
+            error = new Error(`Unable to get root orgs with given config ${JSON.stringify(rootOrgClient.config)} attempt:${i + 1} with error ${err.message}`);
+            continue;
+        }
+    }
+
+    if (error) {
+        throw new Error(`Unable to get root orgs with given config ${JSON.stringify(rootOrgClient.config)} with error ${error.message}`);
+    }
+
+    return true;
+}
 
 function validateuser(user) {
     let userProperties = {};
@@ -50,6 +82,7 @@ async function Initialize() {
         config.flagConfigPollingIntervalMillis = flagConfigPollingIntervalMillis * 1000;
         experiment = Experiment.Experiment.initializeLocal(deploymentKey, config);
         await experiment.start();
+        await initializeRootOrg();
     } catch (e) {
         throw new Error(`unable to create local evaluation client with error ${e.message}`)
     }
@@ -59,6 +92,12 @@ async function fetch(flagName, user) {
     try {
         const userProp = validateuser(user);
         const expUser = {user_properties: userProp};
+        if (userProp?.org_id) {
+            const [org, exists] = rootOrgClient.evaluate(userProp.org_id);
+            if (exists && org) {
+                expUser.user_properties.org_id=org;
+            }
+        }
         return await experiment.evaluate(expUser, [flagName]);
     } catch (e) {
         return new Error(`error in evaluating flag: ${flagName} error: ${e}`)
@@ -89,4 +128,11 @@ async function GetFeatureFlagPayload(flagName, user) {
     return data[flagName];
 }
 
-module.exports = {GetFeatureFlagPayload, GetFeatureFlagBool, GetFeatureFlagString, Initialize}
+module.exports = {
+    initializeRootOrg,
+    getRootOrgClient: () => rootOrgClient,
+    GetFeatureFlagPayload,
+    GetFeatureFlagBool,
+    GetFeatureFlagString,
+    Initialize
+};

@@ -1,6 +1,6 @@
 {
   "name": "local-evaluation",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "starts local evaluation amplitudes server",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "author": "chandrjeetn@lambdatest.com",
   "license": "ISC",
   "dependencies": {
-    "@amplitude/experiment-node-server": "^1.4.0",
+    "@amplitude/experiment-node-server": "^1.13.4",
     "lodash": "^4.17.21"
   }
 }
